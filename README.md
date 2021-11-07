@@ -1,2 +1,3 @@
-# FetchSPECs
-All SPEC files maintained by iztokf
+# SPEC files
+
+Fedora packages maintained by iztokf.
