@@ -10,22 +10,22 @@ interaction with swarm optimizations.}
 
 Name:           python-%{pypi_name}
 Version:        1.3.0
-Release:        6%{?dist}
+Release:        8%{?dist}
 Summary:        A Python-based Particle Swarm Optimization (PSO) library
 
 License:        MIT
 URL:            https://github.com/ljvmiranda921/pyswarms
-Source0:        %{pypi_source}
+Source0:        %{pypi_source %{pypi_name}}
 
 # Fix compatibility with the newest sphinx stack
+# already resolved in https://github.com/ljvmiranda921/pyswarms/pull/468
+# remove patch when new version is released
 Patch0:         Patch1.patch
 
 BuildArch:      noarch
 
-# For the patch
-BuildRequires:  git-core
-
 BuildRequires:  python3-devel
+BuildRequires:  git-core
 BuildRequires:  python3dist(numpy) >= 1.10.4
 BuildRequires:  python3dist(scipy) >= 0.17
 BuildRequires:  python3dist(setuptools)
@@ -91,6 +91,12 @@ rm -rf %{buildroot}/%{python3_sitelib}/tests
 %license LICENSE
 
 %changelog
+* Sun Nov 7 2021 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 1.3.0-8
+- Source correction
+
+* Mon Nov 1 2021 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 1.3.0-7
+- Remove dependency
+
 * Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.0-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 

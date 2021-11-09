@@ -1,4 +1,5 @@
 python-batalgorithm
+python-cro
 python-contextualbandits
 python-earthpy
 python-EvoPreprocess
