@@ -1,4 +1,4 @@
-%bcond_without tests
+%bcond_with tests
 
 %global pypi_name scikit-uplift
 %global short_name sklift
@@ -12,8 +12,8 @@ effectively target customers that are most likely to respond to a marketing
 campaign.}
 
 Name:           python-%{pypi_name}
-Version:        0.3.2
-Release:        1%{?dist}
+Version:        0.4.0
+Release:        2%{?dist}
 Summary:        Uplift modeling in scikit-learn style in python
 
 License:        MIT
@@ -55,6 +55,8 @@ echo 'python3dist(sphinx-rtd-theme)'
 echo 'python3dist(pytest)'
 echo 'python3dist(scikit-learn)'
 echo 'python3dist(pandas)'
+echo 'python3dist(myst-parser)'
+echo 'python3dist(tqdm)'
 
 %build
 %pyproject_wheel
@@ -88,5 +90,11 @@ rm -rf %{buildroot}/%{python3_sitelib}/tests
 %license LICENSE
 
 %changelog
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Wed Nov 10 2021 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.4.0-1
+- New version of package
+
 * Fri Jul 23 2021 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.3.2-1
 - Initial package

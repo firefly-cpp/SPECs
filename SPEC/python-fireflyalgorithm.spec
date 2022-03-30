@@ -5,7 +5,7 @@
 Implementation of Firefly Algorithm (FA) for optimization.}
 
 Name:           python-%{new_name}
-Version:        0.2
+Version:        0.3
 Release:        1%{?dist}
 Summary:        Implementation of Firefly Algorithm in Python
 
@@ -23,8 +23,8 @@ Obsoletes: python-FireflyAlgorithm < 0.0.4-2
 %package -n python3-%{new_name}
 Summary:        %{summary}
 BuildRequires:  python3-devel
-BuildRequires:  pyproject-rpm-macros
 BuildRequires:  %{py3_dist toml-adapt}
+BuildRequires:  %{py3_dist pytest}
 
 Provides: python3-FireflyAlgorithm = %{version}-%{release}
 Obsoletes: python3-FireflyAlgorithm < 0.0.4-2
@@ -36,7 +36,8 @@ Obsoletes: python3-FireflyAlgorithm < 0.0.4-2
 rm -rf %{pretty_name}.egg-info
 rm -fv poetry.lock
 
-toml-adapt -path pyproject.toml -a change -dep numpy -ver X
+# Make deps consistent with Fedora deps
+toml-adapt -path pyproject.toml -a change -dep ALL -ver X
 
 %generate_buildrequires
 %pyproject_buildrequires -r
@@ -46,13 +47,30 @@ toml-adapt -path pyproject.toml -a change -dep numpy -ver X
 
 %install
 %pyproject_install
-%pyproject_save_files %{pretty_name}
+%pyproject_save_files %{new_name}
+
+%check
+%pytest
 
 %files -n python3-%{new_name} -f %{pyproject_files}
 %license LICENSE
-%doc README.md
+%doc README.md examples/
 
 %changelog
+* Sat Mar 12 2022 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.3-1
+- Update to the latest upstream's release
+- Enable tests
+- Install examples
+
+* Thu Jan 20 2022 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.2-4
+- Remove unneeded dependency
+
+* Thu Jan 6 2022 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.2-3
+- Support Python 3.11+ versions
+
+* Wed Dec 1 2021 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.2-2
+- Support Python 3.11
+
 * Fri Sep 10 2021 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.2-1
 - Update to the latest upstream's release
 

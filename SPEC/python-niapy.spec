@@ -1,8 +1,26 @@
 %bcond_without tests
+# Sphinx-generated HTML documentation is not suitable for packaging; see
+# https://bugzilla.redhat.com/show_bug.cgi?id=2006555 for discussion.
+#
+# We would like to generate PDF documentation as a substitute, but have not
+# been able to successfully build the Sphinx-generated LaTeX for this
+# particular package.
+%bcond_with doc_pdf
 
-%global pypi_name niapy
-%global pretty_name NiaPy
-%global fullver 2.0.0rc18
+%global forgeurl https://github.com/NiaOrg/NiaPy
+%global tag %{version}
+
+Name:           python-niapy
+Version:        2.0.1
+%forgemeta
+Release:        1%{?dist}
+Summary:        Micro framework for building nature-inspired algorithms
+
+License:        MIT
+URL:            %{forgeurl}
+Source0:        %{forgesource}
+
+BuildArch:      noarch
 
 %global _description %{expand:
 Nature-inspired algorithms are a very popular tool for solving optimization
@@ -14,88 +32,124 @@ algorithms is sometimes a difficult, complex and tedious task. In order to
 break this wall, NiaPy is intended for simple and quick use, without spending
 time for implementing algorithms from scratch.}
 
-
-Name:           python-%{pypi_name}
-Version:        2.0.0
-Release:        0.2rc18%{?dist}
-Summary:        Micro framework for building nature-inspired algorithms
-
-License:        MIT
-URL:            https://pypi.org/pypi/%{pypi_name}
-Source0:        https://github.com/NiaOrg/%{pretty_name}/archive/%{fullver}/%{pretty_name}-%{fullver}.tar.gz
-
-BuildArch:      noarch
-
 %description %_description
 
-%package -n python3-%{pypi_name}
+%package -n python3-niapy
 Summary:        %{summary}
-BuildRequires:  make
 BuildRequires:  python3-devel
-BuildRequires:  %{py3_dist setuptools}
-# For documentation
-BuildRequires:  %{py3_dist sphinx}
-BuildRequires:  %{py3_dist sphinx-press-theme}
-BuildRequires:  %{py3_dist astroid}
-BuildRequires:  %{py3_dist matplotlib}
-BuildRequires:  %{py3_dist numpy}
-BuildRequires:  %{py3_dist openpyxl}
-BuildRequires:  %{py3_dist pandas}
 
-# for tests
 %if %{with tests}
-BuildRequires:  python3-pytest
+# setup.py: tests_require
+#
+# flake8 ~= 3.7.7
+# astroid >= 2.0.4
+# pytest ~= 3.7.1
+# coverage ~= 4.4.2
+# coverage-space ~= 1.0.2
+#
+# We do not run flake8:
+# https://docs.fedoraproject.org/en-US/packaging-guidelines/Python/#_linters
+# …nor do we care about test coverage. Furthermore, we must accept any newer
+# version of pytest.
+BuildRequires:  python3dist(pytest) >= 3.7.1
 %endif
 
-%description -n python3-%{pypi_name} %_description
+%description -n python3-niapy %_description
 
 %package doc
-Summary:        %{summary}
+Summary:        Documentation and examples for %{name}
+
+%if %{with doc_pdf}
+BuildRequires:  make
+BuildRequires:  python3dist(sphinx)
+BuildRequires:  python3-sphinx-latex
+BuildRequires:  latexmk
+BuildRequires:  tex-xetex-bin
+BuildRequires:  /usr/bin/xindy
+%endif
 
 %description doc
-Documentation for %{name}.
+%{summary}.
+
+Full HTML documentation is available at
+https://niapy.readthedocs.io/en/stable/index.html.
 
 %prep
-%autosetup -n %{pretty_name}-%{fullver}
-rm -rf %{pretty_name}.egg-info
+%forgeautosetup
+# Since we aren’t building HTML documentation, we don’t need the HTML theme
+# dependency:
+sed -r -i 's/^(sphinx-.*theme)/#\1/' docs/requirements.txt
+# Since pdflatex cannot handle Unicode inputs in general:
+echo "latex_engine = 'xelatex'" >> docs/source/conf.py
+# Avoid: ! LaTeX Error: Too deeply nested.
+# Normally we could add a preamble like:
+#
+#   cat >> docs/source/conf.py <<'EOF'
+#   latex_elements['preamble'] = r'''
+#   \usepackage{enumitem}
+#   \setlistdepth{99}
+#   '''
+#   EOF
+#
+# but that does not work well (“Undefined control sequence”).
+#
+# We can also try:
+#
+#   echo "latex_elements['maxlistdepth'] = '10'" >> docs/source/conf.py
+#
+# but this produces errors like:
+#
+#   ! LaTeX Error: \begin{list} on input line 21785 ended by \end{itemize}.
 
-# Replace ~ in setup.py with >
-sed -i 's/~/>/' setup.py
+%generate_buildrequires
+%pyproject_buildrequires -r %{?with_pdf_doc:docs/requirements.txt}
 
 %build
-%py3_build
+%pyproject_wheel
 
-PYTHONPATH=%{buildroot}/%{python3_sitelib} make -C docs SPHINXBUILD=sphinx-build-3 html
-rm -rf docs/build/html/{.doctrees,.buildinfo} -vf
+%if %{with doc_pdf}
+PYTHONPATH="${PWD}" %make_build -C docs latex SPHINXOPTS='%{?_smp_mflags}'
+%make_build -C docs/build/latex LATEXMKOPTS='-quiet -f'
+%endif
 
 %install
-%py3_install
-
-# Remove extra install files
-rm -rf %{buildroot}/%{python3_sitelib}/tests
+%pyproject_install
+%pyproject_save_files niapy
 
 %check
 %if %{with tests}
-# Four tests are failing
-PYTHONPATH=%{buildroot}/%{python3_sitelib} pytest -ra \
-    -k 'not test_Custom_works_fine and not test_griewank_works_fine' \
-    -k 'not test_FA_iters_fine and not test_FA_evals_fine and not test_katsuura' \
+#k="${k-}${k+ and }not test_to_skip_sample1"
+#k="${k-}${k+ and }not test_to_skip_sample2"
+%pytest -ra -k "${k-}"
 %endif
 
-%files -n python3-%{pypi_name}
-%license LICENSE
+%files -n python3-niapy -f %{pyproject_files}
 %doc README.rst README.md CHANGELOG.md Algorithms.md Problems.md
-%{python3_sitelib}/%{pypi_name}-%{fullver}-py%{python3_version}.egg-info
-%{python3_sitelib}/%{pypi_name}
 
 %files doc
 %license LICENSE
-%doc docs/build/html
+%if %{with doc_pdf}
+%doc docs/build/latex/NiaPy.pdf
+%endif
 %doc examples/
 %doc paper/
 %doc CONTRIBUTING.md CODE_OF_CONDUCT.md
 
 %changelog
+* Sat Mar 5 2022 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 2.0.1-1
+- Update to the latest upstream's release
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Dec 31 2021 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 2.0.0-1
+- Update to the latest upstream's release (second stable release)
+
+* Mon Nov 29 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 2.0.0-0.3rc18
+- Port to pyproject-rpm-macros (“new guidelines”)
+- Drop HTML documentation
+- Stop skipping tests; they all pass now
+
 * Wed Aug 18 2021 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 2.0.0-0.1rc18
 - Update to the latest upstream's release - rc18
 

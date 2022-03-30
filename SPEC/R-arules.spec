@@ -13,7 +13,7 @@ Apriori and Eclat. Hahsler, Gruen and Hornik (2005)
 
 Name:             R-%{packname}
 Version:          1.6.8
-Release:          2%{?dist}
+Release:          3%{?dist}
 Source0:          ftp://cran.r-project.org/pub/R/contrib/main/%{packname}_%{ver}-%{packrel}.tar.gz
 License:          GPLv3
 URL:              https://cran.r-project.org/web/packages/arules/index.html
@@ -67,6 +67,9 @@ export _R_CHECK_FORCE_SUGGESTS_=0 LANG=C.UTF-8
 %{_libdir}/R/library/%{packname}/libs
 
 %changelog
+* Wed Jan 19 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.8-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
 * Wed Jul 21 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.8-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 

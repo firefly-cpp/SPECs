@@ -11,13 +11,13 @@ compatible with scikit-learn and is part of scikit-learn-contrib projects.}
 
 
 Name:           python-%{pretty_name}
-Version:        0.8.1
-Release:        1%{?dist}
+Version:        0.9.0
+Release:        3%{?dist}
 Summary:        A Python Package to Tackle the Imbalanced Datasets in Machine Learning
 
 License:        MIT
 URL:            https://github.com/scikit-learn-contrib/%{pretty_name}
-Source0:        %{url}/archive/%{version}/%{pretty_name}-%{version}.tar.gz
+Source0:        %{pypi_source imbalanced-learn}
 
 BuildArch:      noarch
 
@@ -56,7 +56,7 @@ rm -rvf %{buildroot}/%{python3_sitelib}/tests
 %if %{with tests}
 %check
 # some tests are skipped, because of keras and tensorflow deps
-%pytest -k 'not test_all_estimators and not test_classification_report_imbalanced_multiclass_with_unicode_label and not test_rusboost and not test_cluster_centroids_n_jobs'
+%pytest -k 'not test_all_estimators and not test_classification_report_imbalanced_multiclass_with_unicode_label and not test_rusboost and not test_cluster_centroids_n_jobs and not test_fit_docstring and not keras and not test_function_sampler_validate'
 %endif
 
 %files -n python3-%{pretty_name}
@@ -66,6 +66,15 @@ rm -rvf %{buildroot}/%{python3_sitelib}/tests
 %{python3_sitelib}/%{lib_name}
 
 %changelog
+* Thu Jan 27 2022 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.9.0-3
+- Disable one additional test
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Tue Jan 11 2022 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.9.0-1
+- New version - 0.9.0
+
 * Wed Sep 29 2021 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.8.1-1
 - New version - 0.8.1
 

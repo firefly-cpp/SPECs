@@ -10,7 +10,7 @@ interaction with swarm optimizations.}
 
 Name:           python-%{pypi_name}
 Version:        1.3.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        A Python-based Particle Swarm Optimization (PSO) library
 
 License:        MIT
@@ -91,6 +91,9 @@ rm -rf %{buildroot}/%{python3_sitelib}/tests
 %license LICENSE
 
 %changelog
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.0-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
 * Sun Nov 7 2021 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 1.3.0-8
 - Source correction
 

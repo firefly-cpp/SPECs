@@ -1,6 +1,6 @@
 Name:		uARMSolver
-Version:	0.2.1
-Release:	2%{?dist}
+Version:	0.2.4
+Release:	1%{?dist}
 Summary:	Universal Association Rule Mining Solver
 
 License:	MIT
@@ -12,7 +12,7 @@ BuildRequires:	make
 
 %description
 uARMSolver allows users to preprocess their data in a transaction database, to 
-make discretization of data, to search for association rules and to guide a 
+make discretization of data, to search for association rules and to guide a
 presentation/visualization of the best rules found using external tools. 
 Mining the association rules is defined as an optimization and solved using 
 the nature-inspired algorithms that can be incorporated easily. Because 
@@ -31,16 +31,34 @@ external tools.
 %install
 mkdir -p %{buildroot}%{_bindir}
 install -p -m 0755 ./bin/uARMSolver %{buildroot}/%{_bindir}/%{name}
+	
+install -D -t '%{buildroot}%{_mandir}/man1' -m 0644 %{name}.1
+
 rm -f %{buildroot}%{_infodir}/dir
 
 %files
 %{_bindir}/uARMSolver
 %license LICENSE
 %doc bin/README.txt
+%doc docs/2010.10884.pdf
+%{_mandir}/man1/%{name}.1*
 
 %changelog
+* Sun Mar 20 2022 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.2.4-1
+- New upstream's release
+
+* Sun Jan 23 2022 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.2.3-1
+- Add docs
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Wed Nov 17 2021 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.2.2-1
+- New upstream's release
+- Add man page
+
 * Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.1-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild 
 
 * Sun Feb 14 2021 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.2.1-1
 - New version - 0.2.1

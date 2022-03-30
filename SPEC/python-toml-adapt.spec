@@ -4,12 +4,19 @@
 %global pretty_name toml_adapt
 
 %global _description %{expand:
-This is a very simple cli for manipulating toml files.}
+Working with TOML files is becoming inevitable during the package maintenance
+process in different ecosystems. Many times package maintainers must either
+change the version of dependency or add/remove dependencies when building
+their packages, due to the inconsistent base system. For example, solving
+this issue can be done either by using the provided patches or using sed
+commands. However, this may be slightly time-consuming and irritating. A
+very simple yet user-friendly command line interface was developed in
+order to make this process easier.}
 
 Name:           python-%{original_name}
-Version:        0.1.6
+Version:        0.2.5
 Release:        1%{?dist}
-Summary:        Adapt toml files
+Summary:        A very simple CLI for manipulating toml files
 
 License:        MIT
 URL:            https://github.com/firefly-cpp/%{original_name}
@@ -54,17 +61,47 @@ rm -fv poetry.lock
 install -D -t '%{buildroot}%{_mandir}/man1' -m 0644 %{original_name}.1
 
 %check
-%if %{with tests}
+# use smoke tests
+%pyproject_check_import
+
+# unit tests
 %pytest
-%endif
 
 %files -n python3-%{original_name} -f %{pyproject_files}
 %{_bindir}/%{original_name}
 %license LICENSE
-%doc README.md
+%doc README.md AUTHORS.rst CODE_OF_CONDUCT.md CHANGELOG.md
 %{_mandir}/man1/%{original_name}.1*
  
 %changelog
+* Mon Feb 28 2022 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.2.5-1
+- Update to the latest upstream's release
+
+* Sat Jan 29 2022 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.2.4-1
+- Update to the latest upstream's release
+- Enable unit tests
+
+* Tue Jan 25 2022 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.2.3-1
+- Update to the latest release
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jan 14 2022 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.2.1-1
+- Update to the latest release
+
+* Fri Jan 14 2022 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.2.0-4
+- Improve description
+
+* Thu Jan 13 2022 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.2.0-3
+- Update doc section with new documents
+
+* Thu Jan 13 2022 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.2.0-2
+- Enable smoke tests
+
+* Thu Jan 13 2022 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.2.0-1
+- Update to the latest release
+
 * Wed Oct 27 2021 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.1.6-1
 - Update to the latest release
 

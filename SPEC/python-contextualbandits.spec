@@ -10,14 +10,14 @@ and compare ideas, to reproduce research papers that don't provide
 easily-available implementations of their proposed algorithms, and to
 serve as a guide in learning about contextual bandits.}
 
-%global commit          8c935a254129050ca7355f4d1ec5608bcdcd3bb5
-%global snapshotdate    20210419
+%global commit          d4eb6597c8ab0b6a249d7fd62928a6c0830fe1d0
+%global snapshotdate    20211228
 %global shortcommit     %(c=%{commit}; echo ${c:0:7})
 
 Name:           python-%{pypi_name}
-Version:        0.3.14
+Version:        0.3.17
 Release:        3%{?dist}
-Summary:        Python Implementations of Algorithms for Contextual Bandits
+Summary:        Python implementations of algorithms for contextual bandits
 
 License:        BSD
 URL:            https://github.com/david-cortes/contextualbandits
@@ -26,24 +26,13 @@ URL:            https://github.com/david-cortes/contextualbandits
 # we do not rely on Pypi version (no docs, no LICENSE included)
 Source0:        %url/archive/%{commit}/%{pypi_name}-%{commit}.tar.gz
 
-# we remove -march=native option which is not supported on powerpc 
-Patch0:         0001-Remove-Compile-Flags-for-contextualbandits.patch
-
 BuildRequires:  python3-devel
 BuildRequires:  python3dist(setuptools)
+BuildRequires:  python3dist(pip)
+BuildRequires:  python3dist(wheel)
 BuildRequires:  make
 BuildRequires:  gcc-c++
 BuildRequires:  Cython
-
-# For the patch
-BuildRequires:  git-core
-
-#package specific BRs
-BuildRequires:  python3dist(numpy)
-BuildRequires:  python3dist(scipy)
-BuildRequires:  python3dist(pandas)
-BuildRequires:  python3dist(scikit-learn)
-BuildRequires:  python3dist(joblib)
 
 # For documentation
 BuildRequires:  python3dist(sphinx)
@@ -65,9 +54,19 @@ Documentation for %{name}.
 
 %prep
 %autosetup -n %{pypi_name}-%{commit}
+rm -rf %{pypi_name}.egg-info
+# remove toml file. It is actually not used in real build.
+rm -rf pyproject.toml
+
+%generate_buildrequires
+echo 'python3dist(numpy)'
+echo 'python3dist(scipy)'
+echo 'python3dist(pandas)'
+echo 'python3dist(scikit-learn)'
+echo 'python3dist(joblib)'
 
 %build
-%py3_build
+%pyproject_wheel
 
 # Generate html docs
 PYTHONPATH=${PWD} sphinx-build-3 docs html
@@ -75,13 +74,13 @@ PYTHONPATH=${PWD} sphinx-build-3 docs html
 rm -rf html/.{doctrees,buildinfo}
 
 %install
-%py3_install
+%pyproject_install
 
-%files -n python3-%{pypi_name}
+%pyproject_save_files %{pypi_name}
+
+%files -n python3-%{pypi_name} -f %{pyproject_files}
 %doc README.md
 %license LICENSE
-%{python3_sitearch}/%{pypi_name}
-%{python3_sitearch}/%{pypi_name}-%{version}-py%{python3_version}.egg-info
 
 %files doc
 %license LICENSE
@@ -89,6 +88,16 @@ rm -rf html/.{doctrees,buildinfo}
 %doc example/
 
 %changelog
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.17-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Mon Jan 3 2022 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.3.17-2
+- Port to pyproject-rpm-macros
+
+* Sat Jan 1 2022 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.3.17-1
+- Update to the latest upstream's release
+- Remove patch
+
 * Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.14-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 

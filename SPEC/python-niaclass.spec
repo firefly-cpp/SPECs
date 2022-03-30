@@ -12,7 +12,7 @@ The NiaClass classifier support numerical and categorical features.}
 
 Name:           python-%{pypi_name}
 Version:        0.1.2
-Release:        4%{?dist}
+Release:        6%{?dist}
 Summary:        Python framework for building classifiers using nature-inspired algorithms
 
 License:        MIT
@@ -29,7 +29,6 @@ Summary:        %{summary}
 BuildRequires:  make
 BuildRequires:  git-core
 BuildRequires:  python3-devel
-BuildRequires:  pyproject-rpm-macros
 BuildRequires: %{py3_dist lockfile}
 BuildRequires: %{py3_dist packaging}
 BuildRequires: %{py3_dist pep517}
@@ -93,6 +92,12 @@ rm -rf %{buildroot}/%{python3_sitelib}/CHANGELOG.md
 %doc examples/
 
 %changelog
+* Mon Jan 24 2022 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.1.2-6
+- Remove dependency (pyproject-rpm-macros)
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.1.2-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
 * Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.1.2-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 

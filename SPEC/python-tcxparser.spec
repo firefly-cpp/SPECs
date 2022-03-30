@@ -10,8 +10,8 @@ any way exhaustive. It extracts just enough data to show the most important
 attributes of sport activity.}
 
 Name:           python-%{pretty_name}
-Version:        2.0.0
-Release:        4%{?dist}
+Version:        2.2.0
+Release:        1%{?dist}
 Summary:        Tcxparser is a minimal parser for Garmin TCX file format
 
 License:        BSD
@@ -33,23 +33,39 @@ Summary:        %{summary}
 
 %prep
 %autosetup -n %{pypi_name}-%{version}
+rm -rf %{pypi_name}.egg-info
+
+%generate_buildrequires
+%pyproject_buildrequires -r
 
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
+
+%pyproject_save_files %{pretty_name}
 
 %check
 %{python3} setup.py test
 
-%files -n python3-%{pretty_name}
+%files -n python3-%{pretty_name} -f %{pyproject_files}
 %license LICENSE
 %doc README.rst AUTHORS.rst CHANGES.rst
-%{python3_sitelib}/%{extract_name}-%{version}-py%{python3_version}.egg-info
-%{python3_sitelib}/%{pretty_name}
 
 %changelog
+* Sun Jan 23 2022 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 2.2.0-1
+- New version of software - 2.2.0
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Dec 31 2021 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 2.1.0-2
+- Use pyproject rpm macros
+
+* Thu Dec 30 2021 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 2.1.0-1
+- New version of software - 2.1.0
+
 * Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.0-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 
@@ -70,4 +86,3 @@ Summary:        %{summary}
 
 * Sat Nov 14 2020 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 1.1.0-1
 - Initial package
-

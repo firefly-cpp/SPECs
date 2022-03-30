@@ -7,16 +7,18 @@ application.
 
 Name:       python-%{pkg_name}
 Version:    2.2.0
-Release:    1%{?dist}
+Release:    5%{?dist}
 Summary:    Flask html response minifier
 License:    BSD
 URL:        https://github.com/hamidfzm/%{mod_name}
-Source0:    https://files.pythonhosted.org/packages/source/F/%{mod_name}/%{mod_name}-%{version}.tar.gz
+Source0:    %{url}/archive/v%{version}/%{mod_name}-%{version}.tar.gz
 BuildArch:  noarch
 
 BuildRequires:  python%{python3_pkgversion}-htmlmin
+BuildRequires:  python%{python3_pkgversion}-cssmin
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
+BuildRequires:  python%{python3_pkgversion}-pytest
 BuildRequires:  python%{python3_pkgversion}-pytest-runner
 
 %description
@@ -29,31 +31,45 @@ BuildRequires:   python%{python3_pkgversion}-flask
 Requires:  python%{python3_pkgversion}-flask
 Requires:  python%{python3_pkgversion}-htmlmin
 
-%py_provides python3-%{python3_pkgversion}-%{pkg_name}
-
 %description -n python%{python3_pkgversion}-%{pkg_name}
 %{desc}
 
 %prep
 %autosetup -n %{mod_name}-%{version}
+rm -rf %{pypi_name}.egg-info
 
+%generate_buildrequires
+%pyproject_buildrequires -r
 
 %build
-%py3_build
+%pyproject_wheel
 
 
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files flask_htmlmin
 
+%check
+%pytest
 
-%files -n python%{python3_pkgversion}-%{pkg_name}
-%doc README.md
+%files -n python3-%{pkg_name} -f %{pyproject_files}
 %license LICENSE
-%{python3_sitelib}/flask_htmlmin/*.py
-%{python3_sitelib}/flask_htmlmin/__pycache__/*.py*
-%{python3_sitelib}/*.egg-info/
+%doc README.md
 
 %changelog
+* Tue Mar 22 2022 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 2.2.0-5
+- Switch to GitHub Source0
+- Enable tests
+
+* Tue Mar 22 2022 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 2.2.0-4
+- Switch to pyproject-rpm-macros
+
+* Tue Mar 22 2022 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 2.2.0-3
+- Remove obsolete macro
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
 * Mon Oct 18 2021 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 2.2.0-1
 - Update to the latest release
 

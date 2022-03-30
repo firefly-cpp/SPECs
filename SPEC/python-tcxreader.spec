@@ -1,23 +1,22 @@
 %bcond_without tests
 
 %global pypi_name tcxreader
-%global fullversion 0.3.8
+%global fullversion 0.3.13
 
 %global _description %{expand:
 This is a simple TCX parser / reader which can read Garmin TCX file
-extension files. The package currently does not support laps and merges the
-whole exercise into one exercise object. The following data is currently
-parsed: longitude, latitude, elevation, time, distance, hr_value, cadence,
-watts, TPX_speed (extension).}
+extension files. The following data is currently parsed:
+longitude, latitude, elevation, time, distance, hr_value, cadence,
+watts, TPX_speed (extension). It also works well with missing data!}
 
 Name:           python-%{pypi_name}
 Version:        %{?fullversion}
-Release:        4%{?dist}
+Release:        1%{?dist}
 Summary:        tcxreader is a parser/reader for Garmin's TCX file format
 
 License:        MIT
 URL:            https://github.com/alenrajsp/tcxreader
-Source0:        %{pypi_source}
+Source0:        %{pypi_source %{pypi_name}}
 BuildArch:      noarch
 
 %description %_description
@@ -59,6 +58,21 @@ rm -rf %{buildroot}/%{python3_sitelib}/tests
 %{python3_sitelib}/%{pypi_name}-%{version}-py%{python3_version}.egg-info
 
 %changelog
+* Mon Mar 28 2022 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.3.13-1
+- New release
+
+* Wed Mar 23 2022 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.3.9-1
+- New release
+
+* Sat Feb 12 2022 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.3.8-7
+- Update description
+
+* Tue Jan 27 2022 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.3.8-6
+- Correct Source0
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.8-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
 * Mon Nov 1 2021 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.3.8-4
 - Use pytest macro
 

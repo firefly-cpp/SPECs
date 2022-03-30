@@ -1,7 +1,11 @@
 %bcond_with tests
+# Sphinx-generated HTML documentation is not suitable for packaging; see
+# https://bugzilla.redhat.com/show_bug.cgi?id=2006555 for discussion.
+#
+# We can generate PDF documentation as a substitute.
+%bcond_without doc_pdf
 
 %global pypi_name sport-activities-features
-%global pretty_name sport_activities_features
 
 %global _description %{expand:
 A minimalistic toolbox for extracting features 
@@ -13,7 +17,7 @@ of identified hills vs. total distance), average ascent of hills,
 total ascent, total descent and many others.}
 
 Name:           python-%{pypi_name}
-Version:        0.2.7
+Version:        0.2.14
 Release:        1%{?dist}
 Summary:        A toolbox for extracting features from sport activity files 
 
@@ -32,12 +36,16 @@ Summary:        %{summary}
 
 BuildRequires:  git-core
 BuildRequires:  python3-devel
-BuildRequires:  pyproject-rpm-macros
-BuildRequires:  %{py3_dist toml-adapt} 
+BuildRequires:  %{py3_dist toml-adapt}
+BuildRequires:  %{py3_dist sphinxcontrib-bibtex}
 
-#For documentation
+%if %{with doc_pdf}
+BuildRequires:  make
+BuildRequires:  python3-sphinx-latex
+BuildRequires:  latexmk
 BuildRequires:  %{py3_dist sphinx}
 BuildRequires:  %{py3_dist sphinx-rtd-theme}
+%endif
 
 %if %{with tests}
 BuildRequires:  %{py3_dist pytest}
@@ -45,11 +53,24 @@ BuildRequires:  %{py3_dist pytest}
 
 %description -n python3-%{pypi_name} %_description
 
+%package -n python3-%{pypi_name}-tests
+Summary:        Tests for python3-%{pypi_name}
+
+Requires:       python3-%{pypi_name} = %{version}-%{release}
+
+%description -n python3-%{pypi_name}-tests
+%{summary}.
+
 %package doc
-Summary:        %{summary}
+Summary:        Documentation and examples for %{name}
+
+Requires:       python3-%{pypi_name} = %{version}-%{release}
+# Used in some examples; an indirect dependency of the base package, but not a
+# direct one
+Requires:       %{py3_dist numpy}
 
 %description doc
-Documentation for %{name}.
+%{summary}.
 
 %prep
 %autosetup -n %{pypi_name}-%{version} -S git
@@ -58,8 +79,8 @@ rm -fv poetry.lock
 #make dependencies consistent with Fedora versions
 toml-adapt -path pyproject.toml -a change -dep ALL -ver X
 
-#remove package geotiler (not yet ported to Fedora)
-toml-adapt -path pyproject.toml -a remove -dep geotiler -ver 0.1.0
+# Fix version in docs to match the package version:
+sed -r -i 's/(release = ")[[:digit:].]+"/\1%{version}"/' docs/conf.py
 
 %generate_buildrequires
 %pyproject_buildrequires -r
@@ -67,82 +88,46 @@ toml-adapt -path pyproject.toml -a remove -dep geotiler -ver 0.1.0
 %build
 %pyproject_wheel
 
-make -C docs SPHINXBUILD=sphinx-build-3 html
-rm -rf docs/_build/html/{.doctrees,.buildinfo} -vf
+%if %{with doc_pdf}
+%make_build -C docs latex SPHINXOPTS='%{?_smp_mflags}'
+%make_build -C docs/_build/latex LATEXMKOPTS='-quiet'
+%endif
 
 %install
 %pyproject_install
 %pyproject_save_files sport_activities_features
 
-# Remove extra install files
-rm -rf %{buildroot}/%{python3_sitelib}/LICENSE
-rm -rf %{buildroot}/%{python3_sitelib}/CHANGELOG.md
-
 %check	
 %if %{with tests}
-%pytest -k 'not test_data_analysis'
+%pytest -k 'not test_data_analysis and not test_overpy_node_manipulation'
 %endif
 
 %files -n python3-%{pypi_name} -f %{pyproject_files}
 %license LICENSE
-%doc README.md CHANGELOG.md
+%exclude %{python3_sitelib}/sport_activities_features/tests
+
+%files -n python3-%{pypi_name}-tests
+%{python3_sitelib}/sport_activities_features/tests
 
 %files doc
-%license LICENSE
-%doc docs/_build/html
+# Depends on base package, which provides the LICENSE file
+%doc AUTHORS.rst
+%doc CHANGELOG.md
+%doc CITATION.cff
+%doc CODE_OF_CONDUCT.md
+%doc README.md
+%doc docs/preprints/A_minimalistic_toolbox.pdf
+%if %{with doc_pdf}
+%doc docs/_build/latex/%{pypi_name}.pdf
+%endif
 %doc examples/
 
 %changelog
-* Wed Oct 27 2021 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.2.7-1
+* Sun Feb 20 2022 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.2.14-1
 - Update to the latest upstream's release
 
-* Sat Oct 16 2021 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.2.6-2
-- Disable tests for now (one dependency is missing)
-
-* Sat Oct 16 2021 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.2.6-1
+* Thu Feb 3 2022 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.2.12-1
 - Update to the latest upstream's release
 
-* Fri Sep 24 2021 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.2.5-1
-- Update to the latest upstream release
-
-* Fri Sep 10 2021 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.2.4-2
-- Remove hardcoded dependencies
-
-* Sun Aug 15 2021 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.2.4-1
-- Update to the latest upstream release
-
-* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.3-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
-
-* Fri Jul 16 2021 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.2.3-1
-- Update to the latest upstream release
-
-* Tue Jul 6 2021 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.2.2-1
-- Update to the latest upstream release
-
-* Thu Jul 1 2021 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.2.1-1
-- Update to the latest upstream release
-
-* Wed Jun 30 2021 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.2.0-6
-- Minor corrections
-
-* Wed Jun 30 2021 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.2.0-5
-- Skip one test
-
-* Mon Jun 28 2021 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.2.0-4
-- Corrections (new version of deps became available)
-
-* Wed Jun 9 2021 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.2.0-3
-- Minor corrections
-
-* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 0.2.0-2
-- Rebuilt for Python 3.10
-
-* Wed May 12 2021 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.2.0-1
-- Update to the latest upstream release
-
-* Thu Apr 15 2021 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.1.2-2
-- Install additional files
-
-* Thu Apr 1 2021 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.1.2-1
-- Initial package
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.11-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild

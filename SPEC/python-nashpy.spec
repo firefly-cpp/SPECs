@@ -10,8 +10,8 @@ on 2 player games: Support enumeration, Best response polytope vertex
 enumeration, Lemke Howson algorithm.}
 
 Name:           python-%{pypi_name}
-Version:        0.0.28
-Release:        2%{?dist}
+Version:        0.0.31
+Release:        1%{?dist}
 Summary:        A library to compute equilibria of 2 player normal form games
 
 License:        MIT
@@ -19,8 +19,6 @@ URL:            https://github.com/drvinceknight/%{pretty_name}
 Source0:        %{url}/archive/v%{version}/%{pretty_name}-%{version}.tar.gz
 
 BuildArch:      noarch
-
-BuildRequires:  pyproject-rpm-macros
 
 BuildRequires: %{py3_dist packaging}
 BuildRequires: %{py3_dist pep517}	
@@ -93,6 +91,18 @@ pytest src/nashpy --cov=nashpy --cov-fail-under=5 --flake8
 %endif
 
 %changelog
+* Sat Mar 19 2022 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.0.31-1
+- New upstream's release
+
+* Tue Mar 1 2022 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.0.30-1
+- New upstream's release
+
+* Mon Jan 24 2022 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.0.28-4
+- Remove dependency (pyproject-rpm-macros)
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.0.28-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
 * Wed Oct 27 2021 Iztok Fister Jr. <iztokf AT fedoraproject DOT org> - 0.0.28-2
 - Disable tests for now
 
