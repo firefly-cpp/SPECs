@@ -1,5 +1,6 @@
 python-ast-monitor
 python-batalgorithm
+ccfconvert
 python-contextualbandits
 python-cro
 python-devicely
@@ -12,7 +13,9 @@ python-flask-htmlmin
 python-geotiler
 python-imbalanced-learn
 python-interrogate
+python-limits
 python-maya
+python-matplotlib-venn
 python-nashpy
 python-niaaml
 python-niaclass
@@ -23,6 +26,7 @@ python-pyedflib
 python-pyqt-feedback-flow
 python-pyswarms
 python-pyunicorn
+python-rnc2rng
 python-scikit-uplift
 python-simframe
 python-sklearn-nature-inspired-algorithms
